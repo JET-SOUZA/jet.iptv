@@ -3,38 +3,43 @@ import sqlite3
 import os
 from functools import wraps
 
+# ================================
+# Configuração do Flask
+# ================================
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "CHAVE_SECRETA_SEGURA")  # 🔒 agora usa variável de ambiente (Render-friendly)
+app.secret_key = os.getenv("SECRET_KEY", "CHAVE_SECRETA_PADRAO")  # Use SECRET_KEY no Render
 
-# ================================
-# Configurações de diretórios
-# ================================
+# Diretórios
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ================================
-# Banco de dados
+# Inicialização do banco de dados
 # ================================
+DB_PATH = os.path.join(BASE_DIR, 'database.db')
+
 def init_db():
-    conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password TEXT,
-        premium INTEGER DEFAULT 0
-    )
-    ''')
-    conn.commit()
-    conn.close()
+    if not os.path.exists(DB_PATH):
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                premium INTEGER DEFAULT 0
+            )
+        ''')
+        conn.commit()
+        conn.close()
+        print("Banco inicializado com sucesso!")
 
 init_db()
 
 # ================================
-# Dados de exemplo (mock)
+# Dados de exemplo
 # ================================
 CATEGORIES = {
     "Ao Vivo": [
@@ -52,7 +57,7 @@ CATEGORIES = {
 }
 
 # ================================
-# Funções de autenticação
+# Decorators
 # ================================
 def login_required(f):
     @wraps(f)
@@ -66,14 +71,14 @@ def login_required(f):
 def premium_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'user_id' not in session or session.get('premium') != 1:
+        if session.get('premium') != 1:
             flash('Acesso Premium necessário.')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
 
 # ================================
-# Rotas públicas
+# Rotas
 # ================================
 @app.route('/')
 def index():
@@ -82,11 +87,14 @@ def index():
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
-        cursor = conn.cursor()
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        if not username or not password:
+            flash('Preencha todos os campos!')
+            return redirect(url_for('register'))
         try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
             cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
             conn.commit()
             flash('Usuário registrado com sucesso!')
@@ -100,16 +108,16 @@ def register():
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password))
+        cursor.execute('SELECT id, premium FROM users WHERE username=? AND password=?', (username, password))
         user = cursor.fetchone()
         conn.close()
         if user:
             session['user_id'] = user[0]
-            session['premium'] = user[3]
+            session['premium'] = user[1]
             flash('Login realizado com sucesso!')
             return redirect(url_for('index'))
         else:
@@ -122,9 +130,6 @@ def logout():
     flash('Você saiu da conta.')
     return redirect(url_for('login'))
 
-# ================================
-# Rotas Premium
-# ================================
 @app.route('/category/<category_name>')
 @login_required
 @premium_required
@@ -139,7 +144,16 @@ def player():
     stream_url = request.args.get('url', '')
     return render_template('player.html', stream_url=stream_url)
 
-@app.route('/xtream', methods=['GET', 'POST'])
+@app.route('/playlist', methods=['GET','POST'])
+@login_required
+@premium_required
+def playlist():
+    if request.method == 'POST':
+        m3u_url = request.form.get('m3u_url')
+        return redirect(url_for('player', url=m3u_url))
+    return render_template('playlists.html')
+
+@app.route('/xtream', methods=['GET','POST'])
 @login_required
 @premium_required
 def xtream():
@@ -150,15 +164,6 @@ def xtream():
         stream_url = f"{server}/live/{username}/{password}/channel.m3u8"
         return redirect(url_for('player', url=stream_url))
     return render_template('login_xtream.html')
-
-@app.route('/playlist', methods=['GET', 'POST'])
-@login_required
-@premium_required
-def playlist():
-    if request.method == 'POST':
-        m3u_url = request.form.get('m3u_url')
-        return redirect(url_for('player', url=m3u_url))
-    return render_template('playlists.html')
 
 @app.route('/local')
 @login_required
@@ -184,7 +189,7 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # ================================
-# Execução local (Render ignora)
+# Run
 # ================================
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
