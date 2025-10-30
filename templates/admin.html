@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Painel Admin</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background:#f5f7fb; }
+    .card { background:white; padding:16px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); margin-bottom:16px;}
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:8px; text-align:left; border-bottom:1px solid #eee; }
+    input, button { padding:8px; margin-right:8px; }
+    .small { font-size:13px; color:#666; }
+    form.inline { display:inline; }
+  </style>
+</head>
+<body>
+  <h1>Painel Admin</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div style="color:green;">
+        {% for m in messages %} {{ m }} <br> {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <h3>Criar usuário</h3>
+    <form action="{{ url_for('admin_create_user') }}" method="post">
+      <input name="username" placeholder="username" required>
+      <input name="password" placeholder="senha" required>
+      <label><input type="checkbox" name="premium"> Premium</label>
+      <label><input type="checkbox" name="is_admin"> Admin</label>
+      <input name="expires_hours" placeholder="expira em (horas) - opcional" style="width:160px;">
+      <button type="submit">Criar</button>
+    </form>
+    <p class="small">Crie usuários de teste colocando 2 em "expira em (horas)".</p>
+  </div>
+
+  <div class="card">
+    <h3>Usuários</h3>
+    <table>
+      <thead><tr><th>ID</th><th>Username</th><th>Premium</th><th>Admin</th><th>Expira em</th><th>Ações</th></tr></thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td>{{ u['id'] }}</td>
+          <td>{{ u['username'] }}</td>
+          <td>{{ 'Sim' if u['premium']==1 else 'Não' }}</td>
+          <td>{{ 'Sim' if u['is_admin']==1 else 'Não' }}</td>
+          <td>{{ u['expires_at'] if u['expires_at'] else '-' }}</td>
+          <td>
+            <form class="inline" action="{{ url_for('admin_toggle_premium', user_id=u['id']) }}" method="post">
+              <button type="submit">{{ 'Remover Premium' if u['premium']==1 else 'Dar Premium' }}</button>
+            </form>
+
+            <form class="inline" action="{{ url_for('admin_set_expiry', user_id=u['id']) }}" method="post">
+              <input name="expires_hours" placeholder="horas" style="width:70px;">
+              <button type="submit">Definir</button>
+            </form>
+
+            <form class="inline" action="{{ url_for('admin_delete_user', user_id=u['id']) }}" method="post" onsubmit="return confirm('Deletar usuário?');">
+              <button type="submit">Deletar</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{{ url_for('index') }}">← Voltar</a>
+</body>
+</html>
