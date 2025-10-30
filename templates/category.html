@@ -3,16 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ category_name }}</title>
+<title>{{ category_name }} | JET IPTV</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 <h2>{{ category_name }}</h2>
+
 <div class="cards-container">
     {% for item in items %}
-    <a href="{{ url_for('player') }}?url={{ item.url }}" class="card">{{ item.name }}</a>
+    <a href="{{ url_for('player') }}?url={{ item.url | urlencode }}" class="card">
+        🎬 {{ item.name }}
+    </a>
+    {% else %}
+    <p>Nenhum conteúdo disponível nesta categoria.</p>
     {% endfor %}
 </div>
-<a href="{{ url_for('index') }}">Voltar</a>
+
+<div style="text-align:center; margin-top:20px;">
+    <a href="{{ url_for('index') }}" class="button">⬅ Voltar ao Início</a>
+</div>
+
 </body>
 </html>
