@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-<h2>Player IPTV</h2>
-<video id="player" width="100%" height="auto" controls autoplay>
-    <source src="{{ stream_url }}" type="application/x-mpegURL">
-    Seu navegador não suporta vídeo.
+<video id="player" controls width="800" height="450">
+    <source src="{{ video_url }}" type="application/x-mpegURL">
 </video>
-<a href="{{ url_for('index') }}">Voltar</a>
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script>
+  const video = document.getElementById('player');
+  if(Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource("{{ video_url }}");
+      hls.attachMedia(video);
+  }
+</script>
+
