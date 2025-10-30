@@ -1,9 +1,26 @@
-import os
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import sqlite3
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = 'SEU_SECRET_KEY'
+
+def init_db():
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT,
+        premium INTEGER DEFAULT 0
+    )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Inicializa banco ao iniciar o app
+init_db()
+
 
 # Dados de exemplo online
 CATEGORIES = {
