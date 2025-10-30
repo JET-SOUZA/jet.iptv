@@ -9,6 +9,9 @@
 <body>
 <h1>Bem-vindo à Plataforma IPTV</h1>
 <div class="cards-container">
+    <a href="{{ url_for('category', category_name='Ao Vivo') }}" class="card">Ao Vivo</a>
+    <a href="{{ url_for('category', category_name='Filmes') }}" class="card">Filmes</a>
+    <a href="{{ url_for('category', category_name='Séries') }}" class="card">Séries</a>
     <a href="{{ url_for('player') }}?url=" class="card">Reproduzir Stream Único</a>
     <a href="{{ url_for('xtream') }}" class="card">Código Xtream</a>
     <a href="{{ url_for('playlist') }}" class="card">Playlist M3U</a>
