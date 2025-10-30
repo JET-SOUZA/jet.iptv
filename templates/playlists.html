@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playlist M3U</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<h2>Carregar Playlist M3U</h2>
+<form method="POST">
+    <input type="text" name="m3u_url" placeholder="Link da playlist .m3u" required>
+    <button type="submit">Reproduzir</button>
+</form>
+<a href="{{ url_for('index') }}">Voltar</a>
+</body>
+</html>
