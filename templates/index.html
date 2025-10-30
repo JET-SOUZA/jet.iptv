@@ -1,37 +1,19 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JET IPTV Legal</title>
-    <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPTV Plataforma</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>🎬 JET IPTV Legal</h1>
-        <p>Assista canais públicos e legais ao vivo, sem precisar de app externo.</p>
-    </header>
-
-    <main>
-        <section class="playlist">
-            <h2>▶️ Acesse sua playlist</h2>
-            <p>
-                Clique abaixo para abrir ou copiar o link M3U:
-            </p>
-            <a href="/playlist" class="btn" target="_blank">Abrir Playlist M3U</a>
-        </section>
-
-        <section class="video-player">
-            <h2>📺 Exemplo de Player (Canal Público)</h2>
-            <video controls width="640" height="360">
-                <source src="https://streaming.camara.gov.br/tv1/manifest.m3u8" type="application/x-mpegURL">
-                Seu navegador não suporta reprodução HLS.
-            </video>
-        </section>
-    </main>
-
-    <footer>
-        <p>Desenvolvido por <strong>JET</strong> — Conteúdo 100% legal.</p>
-    </footer>
+<h1>Bem-vindo à Plataforma IPTV</h1>
+<div class="cards-container">
+    <a href="{{ url_for('player') }}?url=" class="card">Reproduzir Stream Único</a>
+    <a href="{{ url_for('xtream') }}" class="card">Código Xtream</a>
+    <a href="{{ url_for('playlist') }}" class="card">Playlist M3U</a>
+    <a href="#" class="card">Dados Locais</a>
+    <a href="#" class="card">Lista de Playlists</a>
+</div>
 </body>
 </html>
