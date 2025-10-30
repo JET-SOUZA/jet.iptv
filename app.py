@@ -1,18 +1,24 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 import sqlite3
 import os
+from functools import wraps
 
 app = Flask(__name__)
-app.secret_key = 'SEU_SECRET_KEY'
+app.secret_key = os.getenv("SECRET_KEY", "CHAVE_SECRETA_SEGURA")  # 🔒 agora usa variável de ambiente (Render-friendly)
 
-# Pasta de uploads
-UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# ================================
+# Configurações de diretórios
+# ================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Inicializar banco de dados
+# ================================
+# Banco de dados
+# ================================
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
     cursor = conn.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS users(
@@ -27,7 +33,9 @@ def init_db():
 
 init_db()
 
-# Dados de exemplo online
+# ================================
+# Dados de exemplo (mock)
+# ================================
 CATEGORIES = {
     "Ao Vivo": [
         {"name": "Canal 1", "url": "https://teste.com/live1.m3u8"},
@@ -44,9 +52,29 @@ CATEGORIES = {
 }
 
 # ================================
+# Funções de autenticação
+# ================================
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('É necessário estar logado.')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
+
+def premium_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user_id' not in session or session.get('premium') != 1:
+            flash('Acesso Premium necessário.')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
+
+# ================================
 # Rotas públicas
 # ================================
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -56,7 +84,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
         cursor = conn.cursor()
         try:
             cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
@@ -74,7 +102,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        conn = sqlite3.connect('database.db')
+        conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password))
         user = cursor.fetchone()
@@ -85,39 +113,18 @@ def login():
             flash('Login realizado com sucesso!')
             return redirect(url_for('index'))
         else:
-            flash('Usuário ou senha inválidos')
+            flash('Usuário ou senha inválidos.')
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('Você saiu da conta')
+    flash('Você saiu da conta.')
     return redirect(url_for('login'))
 
 # ================================
-# Rotas premium / protegidas
+# Rotas Premium
 # ================================
-
-def login_required(f):
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash('É necessário estar logado')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-def premium_required(f):
-    from functools import wraps
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session or session.get('premium') != 1:
-            flash('Acesso premium necessário')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
 @app.route('/category/<category_name>')
 @login_required
 @premium_required
@@ -170,7 +177,6 @@ def local_files():
                 })
     return render_template('local_files.html', files=all_files)
 
-# Servir arquivos locais
 @app.route('/uploads/<path:filename>')
 @login_required
 @premium_required
@@ -178,7 +184,7 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # ================================
-# Run app
+# Execução local (Render ignora)
 # ================================
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
