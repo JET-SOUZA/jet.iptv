@@ -1,0 +1,3 @@
+mkdir iptv-platform
+cd iptv-platform
+git init
