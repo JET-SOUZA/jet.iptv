@@ -1,16 +1,28 @@
-<video id="player" controls width="800" height="450">
-    <source src="{{ stream_url }}" type="application/x-mpegURL">
-</video>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script>
-  const video = document.getElementById('player');
-  if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource("{{ stream_url }}");
-      hls.attachMedia(video);
-  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = "{{ stream_url }}";
-  }
-</script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        h1 { color: #fff; }
+        video { width: 90%; max-width: 800px; height: auto; margin-top: 20px; border: 2px solid #fff; border-radius: 8px; }
+        a { color: #fff; display: block; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Player IPTV</h1>
 
+    {% if stream_url %}
+        <video controls autoplay>
+            <source src="{{ stream_url }}" type="application/x-mpegURL">
+            Seu navegador não suporta este tipo de vídeo.
+        </video>
+    {% else %}
+        <p>Nenhum stream disponível.</p>
+    {% endif %}
 
+    <a href="{{ url_for('index') }}">← Voltar ao início</a>
+</body>
+</html>
