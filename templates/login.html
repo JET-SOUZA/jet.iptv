@@ -1,76 +1,98 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Xtream</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f4f8;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .login-container {
-        background: #fff;
-        padding: 40px 30px;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-    }
-    h2 {
-        color: #333;
-        margin-bottom: 20px;
-    }
-    input {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-    button {
-        width: 100%;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
-    button:hover {
-        background-color: #0056b3;
-    }
-    .back-link {
-        display: inline-block;
-        margin-top: 15px;
-        color: #007bff;
-        text-decoration: none;
-    }
-    .back-link:hover {
-        text-decoration: underline;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Login Xtream</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 360px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            padding: 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .back-button {
+            margin-top: 10px;
+            background: #6c757d;
+        }
+        .back-button:hover {
+            background: #495057;
+        }
+        .flash {
+            color: red;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
         <h2>🔑 Login Xtream</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">
+              {% for message in messages %}
+                {{ message }}<br>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
         <form method="POST">
             <input type="text" name="server" placeholder="Servidor (ex: http://seuservidor.com:8080)" required>
             <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
-        <a href="{{ url_for('index') }}" class="back-link">← Voltar ao início</a>
+
+        <form action="{{ url_for('index') }}">
+            <button type="submit" class="back-button">← Voltar ao início</button>
+        </form>
     </div>
 </body>
 </html>
