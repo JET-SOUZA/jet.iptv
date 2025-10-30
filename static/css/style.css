@@ -1,14 +1,21 @@
+/* === Estilo geral === */
 body {
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+    color: #f5f5f5;
     text-align: center;
+    margin: 0;
     padding: 20px;
 }
 
+/* === Títulos === */
 h1, h2 {
-    color: #333;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+    margin-bottom: 20px;
 }
 
+/* === Container de cards === */
 .cards-container {
     display: flex;
     flex-wrap: wrap;
@@ -17,38 +24,89 @@ h1, h2 {
     margin-top: 20px;
 }
 
+/* === Card individual === */
 .card {
-    background: #fff;
-    padding: 20px 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    padding: 20px;
+    border-radius: 14px;
     text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    width: 200px;
-    transition: transform 0.2s;
+    color: #f5f5f5;
+    font-weight: 500;
+    width: 180px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0,191,255,0.4);
+    background: rgba(0,191,255,0.15);
 }
 
+/* === Inputs e botões === */
 input, button {
-    padding: 10px;
-    margin: 5px 0;
+    padding: 12px;
+    margin: 8px 0;
     width: 80%;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    outline: none;
+}
+
+input {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid #333;
+}
+
+input::placeholder {
+    color: #aaa;
 }
 
 button {
-    background: #007BFF;
+    background: #00bfff;
     color: white;
-    border: none;
+    font-weight: bold;
     cursor: pointer;
+    transition: all 0.3s;
 }
 
 button:hover {
-    background: #0056b3;
+    background: #008fcc;
+    box-shadow: 0 0 10px rgba(0,191,255,0.5);
+}
+
+/* === Link estilo botão (para "Voltar") === */
+.button {
+    display: inline-block;
+    background: #00bfff;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.button:hover {
+    background: #008fcc;
+}
+
+/* === Player responsivo === */
+video {
+    width: 90%;
+    max-width: 900px;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(0,191,255,0.3);
+}
+
+/* === Layout mobile === */
+@media (max-width: 600px) {
+    .card {
+        width: 45%;
+        padding: 15px;
+    }
 }
