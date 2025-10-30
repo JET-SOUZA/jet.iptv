@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+import os
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Dados de exemplo (pode ser JSON externo ou DB real)
+# Dados de exemplo online
 CATEGORIES = {
     "Ao Vivo": [
         {"name": "Canal 1", "url": "https://teste.com/live1.m3u8"},
@@ -13,8 +16,8 @@ CATEGORIES = {
         {"name": "Filme 2", "url": "https://teste.com/movie2.mp4"}
     ],
     "Séries": [
-        {"name": "Série 1 - Episódio 1", "url": "https://teste.com/serie1e1.mp4"},
-        {"name": "Série 2 - Episódio 1", "url": "https://teste.com/serie2e1.mp4"}
+        {"name": "Série 1 - Ep1", "url": "https://teste.com/serie1e1.mp4"},
+        {"name": "Série 2 - Ep1", "url": "https://teste.com/serie2e1.mp4"}
     ]
 }
 
@@ -48,6 +51,27 @@ def playlist():
         m3u_url = request.form.get('m3u_url')
         return redirect(url_for('player', url=m3u_url))
     return render_template('playlists.html')
+
+# Página de arquivos locais
+@app.route('/local')
+def local_files():
+    all_files = []
+    for category in os.listdir(app.config['UPLOAD_FOLDER']):
+        cat_path = os.path.join(app.config['UPLOAD_FOLDER'], category)
+        if os.path.isdir(cat_path):
+            files = os.listdir(cat_path)
+            for f in files:
+                all_files.append({
+                    "category": category,
+                    "name": f,
+                    "url": f"/uploads/{category}/{f}"
+                })
+    return render_template('local_files.html', files=all_files)
+
+# Servir arquivos locais
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
