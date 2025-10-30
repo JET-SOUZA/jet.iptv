@@ -5,18 +5,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IPTV Plataforma</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f4f8;
+        text-align: center;
+        padding: 30px;
+    }
+    h1 {
+        color: #222;
+        margin-bottom: 20px;
+    }
+    .top-links {
+        margin-bottom: 20px;
+    }
+    .top-links a {
+        margin: 0 10px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .top-links a:hover {
+        text-decoration: underline;
+    }
+    .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+    .card {
+        display: inline-block;
+        background-color: #fff;
+        padding: 15px 25px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #222;
+        font-weight: bold;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 200px;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+</style>
 </head>
 <body>
-<h1>Bem-vindo à Plataforma IPTV</h1>
-<div class="cards-container">
-    <a href="{{ url_for('category', category_name='Ao Vivo') }}" class="card">Ao Vivo</a>
-    <a href="{{ url_for('category', category_name='Filmes') }}" class="card">Filmes</a>
-    <a href="{{ url_for('category', category_name='Séries') }}" class="card">Séries</a>
-    <a href="{{ url_for('player') }}?url=" class="card">Reproduzir Stream Único</a>
-    <a href="{{ url_for('xtream') }}" class="card">Código Xtream</a>
-    <a href="{{ url_for('playlist') }}" class="card">Playlist M3U</a>
-    <a href="#" class="card">Dados Locais</a>
-    <a href="#" class="card">Lista de Playlists</a>
-</div>
+    <h1>Bem-vindo à Plataforma IPTV</h1>
+
+    <div class="top-links">
+        <a href="{{ url_for('login') }}">Entrar</a> |
+        <a href="{{ url_for('register') }}">Registrar</a>
+    </div>
+
+    <div class="cards-container">
+        <a href="{{ url_for('category', category_name='Ao Vivo') }}" class="card">📺 Ao Vivo</a>
+        <a href="{{ url_for('category', category_name='Filmes') }}" class="card">🎬 Filmes</a>
+        <a href="{{ url_for('category', category_name='Séries') }}" class="card">📂 Séries</a>
+        <a href="{{ url_for('player') }}?url=" class="card">▶️ Reproduzir Stream Único</a>
+        <a href="{{ url_for('xtream') }}" class="card">🔑 Código Xtream</a>
+        <a href="{{ url_for('playlist') }}" class="card">📋 Playlist M3U</a>
+        <a href="{{ url_for('local_files') }}" class="card">💾 Dados Locais</a>
+        <a href="{{ url_for('playlists') }}" class="card">📁 Lista de Playlists</a>
+    </div>
 </body>
 </html>
